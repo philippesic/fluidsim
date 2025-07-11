@@ -134,10 +134,16 @@ opengl32.lib
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CudaCompile Include="temp.cu" />
+    <CudaCompile Include="simulation.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="renderer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="fluid.h" />
+    <ClInclude Include="renderer.h" />
+    <ClInclude Include="simulation.cuh" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

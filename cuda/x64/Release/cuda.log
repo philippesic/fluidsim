@@ -1,7 +1,14 @@
-﻿LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
+﻿  Compiling CUDA source file simulation.cu...
+  
+  C:\Users\pippo\github\fluidsim\cuda>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6\bin\nvcc.exe" -gencode=arch=compute_52,code=\"sm_52,compute_52\" --use-local-env -ccbin "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\bin\HostX64\x64" -x cu   -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6\include" -I"C:\libs\glew-2.1.0-win32\glew-2.1.0\include" -I"C:\libs\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include" -I"C:\libs\glm-1.0.1-light\glm" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6\include"     --keep-dir x64\Release  -maxrregcount=0   --machine 64 --compile -cudart static    -DNDEBUG -D_CONSOLE -D_UNICODE -DUNICODE -DGLEW_STATIC -Xcompiler "/EHsc /W3 /nologo /O2 /FS   /MD " -Xcompiler "/Fdx64\Release\vc143.pdb" -o C:\Users\pippo\github\fluidsim\cuda\x64\Release\simulation.cu.obj "C:\Users\pippo\github\fluidsim\cuda\simulation.cu" 
+  simulation.cu
+  tmpxft_000071e0_00000000-7_simulation.cudafe1.cpp
+  main.cpp
+LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
   Generating code
-  Previous IPDB not found, fall back to full compilation.
-  All 11 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  2 of 17 functions (11.8%) were compiled, the rest were copied from previous compilation.
+    1 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
 glew32s.lib(glew.obj) : warning LNK4099: PDB 'vc120.pdb' was not found with 'glew32s.lib(glew.obj)' or at 'C:\Users\pippo\github\fluidsim\x64\Release\vc120.pdb'; linking object as if no debug info
   cuda.vcxproj -> C:\Users\pippo\github\fluidsim\x64\Release\cuda.exe
