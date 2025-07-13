@@ -1,6 +1,7 @@
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\corecrt.h
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\corecrt_malloc.h
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\corecrt_math.h
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\corecrt_math_defines.h
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\corecrt_memcpy_s.h
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\corecrt_memory.h
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\corecrt_search.h
@@ -81,3 +82,4 @@ C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6\include\vector_function
 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6\include\vector_types.h
 C:\Users\pippo\github\fluidsim\cuda\fluid.h
 C:\Users\pippo\github\fluidsim\cuda\simulation.cuh
+C:\Users\pippo\github\fluidsim\cuda\utils.h

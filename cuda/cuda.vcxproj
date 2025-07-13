@@ -144,6 +144,7 @@ opengl32.lib
     <ClInclude Include="fluid.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="simulation.cuh" />
+    <ClInclude Include="utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
