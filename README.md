@@ -10,8 +10,6 @@ Control the camera with your mouse.
 
 Future Updates will include:
 * Increased and adjustable particle density
-* Adjustable fluid properties
-* Expanded Camera Controls
 * Improved Graphics
 * Improved Physics
 * Improved Performance
