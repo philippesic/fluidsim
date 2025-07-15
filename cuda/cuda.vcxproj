@@ -121,7 +121,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);GLEW_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir);C:\libs\glew-2.1.0-win32\glew-2.1.0\include;C:\libs\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;C:\libs\glm-1.0.1-light\glm</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir);C:\libs\glew-2.1.0-win32\glew-2.1.0\include;C:\libs\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;C:\libs\glm-1.0.1-light\glm;C:\libs\imgui-1.92.1</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -137,12 +137,21 @@ opengl32.lib
     <CudaCompile Include="simulation.cu" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\libs\imgui-1.92.1\backends\imgui_impl_glfw.cpp" />
+    <ClCompile Include="..\..\..\..\..\libs\imgui-1.92.1\backends\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\..\..\..\..\libs\imgui-1.92.1\imgui.cpp" />
+    <ClCompile Include="..\..\..\..\..\libs\imgui-1.92.1\imgui_draw.cpp" />
+    <ClCompile Include="..\..\..\..\..\libs\imgui-1.92.1\imgui_tables.cpp" />
+    <ClCompile Include="..\..\..\..\..\libs\imgui-1.92.1\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="renderer.cpp" />
+    <ClCompile Include="ui.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\libs\imgui-1.92.1\backends\imgui_impl_glfw.h" />
+    <ClInclude Include="..\..\..\..\..\libs\imgui-1.92.1\backends\imgui_impl_opengl3.h" />
+    <ClInclude Include="..\..\..\..\..\libs\imgui-1.92.1\imgui.h" />
     <ClInclude Include="fluid.h" />
-    <ClInclude Include="renderer.h" />
+    <ClInclude Include="ui.h" />
     <ClInclude Include="simulation.cuh" />
     <ClInclude Include="utils.h" />
   </ItemGroup>

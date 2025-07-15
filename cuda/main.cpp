@@ -8,6 +8,10 @@
 #include <gtc/type_ptr.hpp>
 #include "simulation.cuh"
 #include "fluid.h"
+#include "ui.h"
+#include "imgui.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
 
 const int NUM_PARTICLES = 1024;
 GLuint vbo, vao, shaderProgram;
@@ -17,7 +21,9 @@ double lastX = 400, lastY = 300;
 float yaw = 0.0f, pitch = 0.0f;
 bool firstMouse = true;
 float radius = 2.0f;
+bool cameraControl = false;
 
+static bool resetSimRequested = false;
 const char* vertexShaderSrc = R"glsl(
 #version 330 core
 layout(location = 0) in vec4 inPos;
@@ -85,6 +91,12 @@ void createVBO(GLuint* vbo, struct cudaGraphicsResource** cudaResource) {
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+    if (!cameraControl) {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = true;
+        return;
+    }
     if (firstMouse) {
         lastX = xpos;
         lastY = ypos;
@@ -105,6 +117,14 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     if (pitch < -89.0f) pitch = -89.0f;
 }
 
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+    // Clamp radius
+    extern float radius;
+    radius -= static_cast<float>(yoffset) * 0.2f;
+    if (radius < 0.5f) radius = 0.5f;
+    if (radius > 10.0f) radius = 10.0f;
+}
+
 int main() {
     if (!glfwInit()) return -1;
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -116,7 +136,8 @@ int main() {
     if (glewInit() != GLEW_OK) return -1;
 
     glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetScrollCallback(window, scroll_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
     cudaFree(0);
 
@@ -136,7 +157,29 @@ int main() {
 
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 10.0f);
 
+    // ImGui setup
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+    FluidUI fluidUI;
+
     while (!glfwWindowShouldClose(window)) {
+        // Handle rmb Camera
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+            if (!cameraControl) {
+                cameraControl = true;
+                firstMouse = true;
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            }
+        } else {
+            if (cameraControl) {
+                cameraControl = false;
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            }
+        }
+
         // Camera orbit
         float camX = radius * sin(glm::radians(yaw)) * cos(glm::radians(pitch));
         float camY = radius * sin(glm::radians(pitch)) -0.5f;
@@ -151,7 +194,8 @@ int main() {
         cudaGraphicsResourceGetMappedPointer((void**)&dptr, &num_bytes, cudaVBO);
 
         // Call Kernel
-        simulateParticles(dptr, NUM_PARTICLES, Fluid::water);
+        simulateParticles(dptr, NUM_PARTICLES, fluidUI.params, fluidUI.shouldReset(), fluidUI.isPaused());
+        fluidUI.clearReset();
 
         cudaGraphicsUnmapResources(1, &cudaVBO, 0);
 
@@ -170,14 +214,28 @@ int main() {
         glBindVertexArray(0);
         glUseProgram(0);
 
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        fluidUI.render();
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        // debug
+		std::cout << fluidUI.shouldReset() << " " << fluidUI.isPaused() << std::endl;
     }
 
     cudaGraphicsUnregisterResource(cudaVBO);
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);
     glDeleteProgram(shaderProgram);
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
     glfwDestroyWindow(window);
     glfwTerminate();
     return 0;

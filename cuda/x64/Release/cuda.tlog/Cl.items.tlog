@@ -1,2 +1,8 @@
+C:\libs\imgui-1.92.1\backends\imgui_impl_glfw.cpp;C:\Users\pippo\github\fluidsim\cuda\x64\Release\imgui_impl_glfw.obj
+C:\libs\imgui-1.92.1\backends\imgui_impl_opengl3.cpp;C:\Users\pippo\github\fluidsim\cuda\x64\Release\imgui_impl_opengl3.obj
+C:\libs\imgui-1.92.1\imgui.cpp;C:\Users\pippo\github\fluidsim\cuda\x64\Release\imgui.obj
+C:\libs\imgui-1.92.1\imgui_draw.cpp;C:\Users\pippo\github\fluidsim\cuda\x64\Release\imgui_draw.obj
+C:\libs\imgui-1.92.1\imgui_tables.cpp;C:\Users\pippo\github\fluidsim\cuda\x64\Release\imgui_tables.obj
+C:\libs\imgui-1.92.1\imgui_widgets.cpp;C:\Users\pippo\github\fluidsim\cuda\x64\Release\imgui_widgets.obj
 C:\Users\pippo\github\fluidsim\cuda\main.cpp;C:\Users\pippo\github\fluidsim\cuda\x64\Release\main.obj
-C:\Users\pippo\github\fluidsim\cuda\renderer.cpp;C:\Users\pippo\github\fluidsim\cuda\x64\Release\renderer.obj
+C:\Users\pippo\github\fluidsim\cuda\ui.cpp;C:\Users\pippo\github\fluidsim\cuda\x64\Release\ui.obj

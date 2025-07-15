@@ -108,16 +108,21 @@ __global__ void integrate(float4* positionsOut, Particle* particles, int count, 
     positionsOut[i] = make_float4(p.position.x, p.position.y, p.position.z, 1.0f);
 }
 
-void simulateParticles(float4* posVBO, int count, FluidParams params) {
+void simulateParticles(float4* posVBO, int count, FluidParams params, bool resetSimRequested, bool paused) {
     static Particle* d_particles = nullptr;
     static bool initialized = false;
+
+    // Reset if requested
+    if (resetSimRequested) {
+        initialized = false;
+    }
 
     if (!initialized) {
         cudaMalloc(&d_particles, count * sizeof(Particle));
         Particle* temp = new Particle[count];
 
-        // Scatter particles
-        float spacing = params.smoothingRadius * 0.55f;
+        // Place particles in a grid (no overlap)
+        float spacing = params.smoothingRadius * 1.05f;
         int gridX = int((params.boundsMax.x - params.boundsMin.x) / spacing);
         int gridY = int((params.boundsMax.y - params.boundsMin.y) / spacing);
         int gridZ = int((params.boundsMax.z - params.boundsMin.z) / spacing);
@@ -143,7 +148,9 @@ void simulateParticles(float4* posVBO, int count, FluidParams params) {
         initialized = true;
     }
 
-    int threads = 256;
-    int blocks = (count + threads - 1) / threads;
-    integrate <<<blocks, threads>>> (posVBO, d_particles, count, params);
+    if (!paused) {
+        int threads = 256;
+        int blocks = (count + threads - 1) / threads;
+        integrate <<<blocks, threads>>> (posVBO, d_particles, count, params);
+    }
 }
