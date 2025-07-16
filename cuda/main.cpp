@@ -13,7 +13,7 @@
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 
-const int NUM_PARTICLES = 1024;
+int num_particles = 16384;
 GLuint vbo, vao, shaderProgram;
 struct cudaGraphicsResource* cudaVBO = nullptr;
 
@@ -79,10 +79,10 @@ GLuint createProgram(const char* vertSrc, const char* fragSrc) {
     return program;
 }
 
-void createVBO(GLuint* vbo, struct cudaGraphicsResource** cudaResource) {
+void createVBO(GLuint* vbo, struct cudaGraphicsResource** cudaResource, int numParticles) {
     glGenBuffers(1, vbo);
     glBindBuffer(GL_ARRAY_BUFFER, *vbo);
-    glBufferData(GL_ARRAY_BUFFER, NUM_PARTICLES * sizeof(float4), nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, numParticles * sizeof(float4), nullptr, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     cudaError_t err = cudaGraphicsGLRegisterBuffer(cudaResource, *vbo, cudaGraphicsMapFlagsWriteDiscard);
     if (err != cudaSuccess) {
@@ -147,7 +147,7 @@ int main() {
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
-    createVBO(&vbo, &cudaVBO);
+    createVBO(&vbo, &cudaVBO, num_particles);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glEnableVertexAttribArray(0);
@@ -155,6 +155,7 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    // Initial projection
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 10.0f);
 
     // ImGui setup
@@ -166,6 +167,11 @@ int main() {
     FluidUI fluidUI;
 
     while (!glfwWindowShouldClose(window)) {
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
+        glViewport(0, 0, width, height);
+        projection = glm::perspective(glm::radians(45.0f), float(width) / float(height), 0.1f, 10.0f);
+
         // Handle rmb Camera
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
             if (!cameraControl) {
@@ -182,25 +188,23 @@ int main() {
 
         // Camera orbit
         float camX = radius * sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-        float camY = radius * sin(glm::radians(pitch)) -0.5f;
+        float camY = radius * sin(glm::radians(pitch));
         float camZ = radius * cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-        glm::vec3 cameraPos = glm::vec3(camX, camY, camZ);
-        glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f);
-        glm::mat4 view = glm::lookAt(cameraPos, target, glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::vec3 simulationCenter(0.0f, 0.0f, 0.0f);
+        glm::vec3 cameraPos = simulationCenter + glm::vec3(camX, camY, camZ);
+        glm::mat4 view = glm::lookAt(cameraPos, simulationCenter, glm::vec3(0.0f, 1.0f, 0.0f));
 
         float4* dptr = nullptr;
         cudaGraphicsMapResources(1, &cudaVBO, 0);
         size_t num_bytes;
         cudaGraphicsResourceGetMappedPointer((void**)&dptr, &num_bytes, cudaVBO);
 
-        // Call Kernel
-        simulateParticles(dptr, NUM_PARTICLES, fluidUI.params, fluidUI.shouldReset(), fluidUI.isPaused());
+        // Update simulation
+        simulateParticles(dptr, num_particles, fluidUI.params, fluidUI.shouldReset(), fluidUI.isPaused());
         fluidUI.clearReset();
 
         cudaGraphicsUnmapResources(1, &cudaVBO, 0);
 
-        // Render
-        glViewport(0, 0, 800, 600);
         glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -210,23 +214,34 @@ int main() {
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
         glBindVertexArray(vao);
-        glDrawArrays(GL_POINTS, 0, NUM_PARTICLES);
+        glDrawArrays(GL_POINTS, 0, num_particles);
         glBindVertexArray(0);
         glUseProgram(0);
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        fluidUI.render();
+        
+        ImGui::Begin("Simulation Settings");
+        if (ImGui::SliderInt("Particle Count", &num_particles, 1, 10000)) {
+            fluidUI.resetRequested = true;
+            cudaGraphicsUnregisterResource(cudaVBO);
+            glDeleteBuffers(1, &vbo);
+            createVBO(&vbo, &cudaVBO, num_particles);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo);
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+        }
+        ImGui::End();
 
+        fluidUI.render();
+        
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
         glfwPollEvents();
-
-        // debug
-		std::cout << fluidUI.shouldReset() << " " << fluidUI.isPaused() << std::endl;
     }
 
     cudaGraphicsUnregisterResource(cudaVBO);

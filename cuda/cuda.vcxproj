@@ -132,6 +132,9 @@ opengl32.lib
 </AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(CudaToolkitLibDir);C:\libs\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;C:\libs\glew-2.1.0-win32\glew-2.1.0\lib\Release\x64</AdditionalLibraryDirectories>
     </Link>
+    <CudaCompile>
+      <AdditionalOptions>--extended-lambda %(AdditionalOptions)</AdditionalOptions>
+    </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <CudaCompile Include="simulation.cu" />

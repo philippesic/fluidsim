@@ -3,7 +3,7 @@
 
 void FluidUI::render() {
     ImGui::Begin("Fluid Controls");
-    ImGui::SliderFloat("Rest Density", &params.restDensity, 100.0f, 2000.0f);
+    ImGui::SliderFloat("Rest Density", &params.restDensity, 0.0f, 2000.0f);
     ImGui::SliderFloat("Viscosity", &params.viscosity, 0.0f, 10.0f);
     ImGui::SliderFloat("Pressure Stiffness", &params.pressureStiffness, 0.1f, 10.0f);
     ImGui::SliderFloat3("Gravity", (float*)&params.gravity, -20.0f, 20.0f);
